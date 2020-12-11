@@ -30,11 +30,10 @@ attach f g l = zip (map f l) (map g l)
 process x = do
     let nums = map read . lines $ x :: [Int]
     let target = snd . fromJust . find (not . valid) . prevs $ nums
-    let summed_tails = map (first getSum) . scanr mappend mempty . (attach Sum return) $ nums :: [(Int, [Int])]
-    let init_sums = uncurry (scanr (-))
+    let summed_tails = map (first getSum) . scanr mappend mempty . (attach Sum return) :: [Int] -> [(Int, [Int])]
+    let sum_subarrs = inits nums >>= summed_tails
     -- TODO: optimize
-    let weakness' = fromJust . find (\l -> length l >= 2 && sum l == target)
-                  . join . map inits . tails $ nums
+    let weakness' = snd . fromJust . find (\(s, l) -> length l >= 2 && s == target) $ sum_subarrs
     putStrLn . show $ (minimum weakness' + maximum weakness')
 
 main = readFile filename >>= process
